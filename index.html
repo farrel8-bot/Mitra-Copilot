@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitra Copilot </title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-bg: #121212;
+            --secondary-bg: #1e1e1e;
+            --text-color: #ffffff;
+            --accent-color: #6200ee;
+            --card-bg: #252525;
+            --input-bg: #2d2d2d;
+        }
+
+        [data-theme="light"] {
+            --primary-bg: #f5f5f5;
+            --secondary-bg: #ffffff;
+            --text-color: #333333;
+            --accent-color: #6200ee;
+            --card-bg: #ffffff;
+            --input-bg: #f0f0f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: var(--secondary-bg);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-title {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            width: 40px; /* Sesuaikan ukuran logo */
+            height: 40px;
+            margin-right: 10px; /* Jarak antara logo dan judul */
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            color: var(--text-color);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        /* Navigation */
+        .nav-bottom {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-around;
+            background-color: var(--secondary-bg);
+            padding: 10px 0;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 0.8rem;
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .nav-item.active {
+            color: var(--accent-color);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding-bottom: 70px;
+        }
+
+        .section {
+            display: none;
+            padding: 20px 0;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--accent-color);
+        }
+
+        /* Login Screen */
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 80vh;
+        }
+
+        .login-card {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .login-title {
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .login-subtitle {
+            margin-bottom: 30px;
+            opacity: 0.8;
+        }
+
+        .login-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .login-btn:hover {
+            opacity: 0.9;
+        }
+
+        .login-btn.google {
+            background-color: #4285F4;
+            color: white;
+        }
+
+        .login-btn.facebook {
+            background-color: #1877F2;
+            color: white;
+        }
+
+        .login-btn.phone {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        /* Chatbot UI */
+        .chat-container {
+            height: 65vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: var(--secondary-bg);
+            border-radius: 10px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 15px;
+            max-width: 80%;
+        }
+
+        .message.user {
+            background-color: var(--accent-color);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message.ai {
+            background-color: var(--card-bg);
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+        }
+
+        .message.ai .typing {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background-color: var(--text-color);
+            border-radius: 50%;
+            margin-right: 3px;
+            animation: typing 1.5s infinite ease-in-out;
+        }
+
+        .message.ai .typing:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .message.ai .typing:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 100% { opacity: 0.3; transform: translateY(0); }
+            50% { opacity: 1; transform: translateY(-5px); }
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 25px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+        }
+
+        .chat-input:focus {
+            outline: 2px solid var(--accent-color);
+        }
+
+        .send-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background-color: var(--accent-color);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .prompt-suggestions {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 10px 0;
+            margin-bottom: 15px;
+        }
+
+        .prompt-suggestion {
+            padding: 8px 15px;
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        /* Market Analysis */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 30px;
+        }
+
+        .segmentation-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .segmentation-tab {
+            padding: 8px 15px;
+            background-color: var(--card-bg);
+            border-radius: 5px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .segmentation-tab.active {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .segmentation-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .segmentation-table th, 
+        .segmentation-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--input-bg);
+        }
+
+        .segmentation-table th {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        /* Content Design Tool */
+        .design-tool {
+            display: flex;
+            height: 70vh;
+        }
+
+        .design-sidebar {
+            width: 250px;
+            background-color: var(--secondary-bg);
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .design-canvas {
+            flex: 1;
+            background-color: var(--card-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .canvas-container {
+            width: 300px;
+            height: 500px;
+            background-color: white;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .template-thumbnail {
+            width: 100%;
+            height: 80px;
+            background-color: var(--input-bg);
+            margin-bottom: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .export-options {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .export-btn {
+            padding: 8px 15px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* News Feed */
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .news-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .news-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .news-content {
+            padding: 15px;
+        }
+
+        .news-source {
+            font-size: 0.8rem;
+            color: var(--accent-color);
+            margin-bottom: 5px;
+        }
+
+        .news-title {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .news-date {
+            font-size: 0.7rem;
+            opacity: 0.7;
+        }
+
+        /* Settings */
+        .settings-card {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .settings-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--input-bg);
+        }
+
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+
+        .version-info {
+            text-align: center;
+            margin-top: 30px;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .design-tool {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .design-sidebar {
+                width: 100%;
+                height: 150px;
+                overflow-x: auto;
+                display: flex;
+                gap: 10px;
+            }
+            
+            .template-thumbnail {
+                width: 100px;
+                height: 80px;
+                flex-shrink: 0;
+            }
+            
+            .design-canvas {
+                height: 400px;
+            }
+            
+            .news-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-title">
+            <img src="logo mitra copilot.png" alt="logo" class="logo">
+            <h1>Mitra Copilot</h1>
+        </div>
+        <button class="theme-toggle" id="themeToggle">
+            <i class="fas fa-moon"></i>
+        </button>
+    </header>
+
+    <div class="container">
+        <div class="main-content">
+            <!-- Login Screen -->
+            <div class="section active" id="loginSection">
+                <div class="login-container">
+                    <div class="login-card">
+                        <h2 class="login-title">Welcome</h2>
+                        <p class="login-subtitle">Mitra Copilot 1.0 - UMKM Digital Transformation Assistant</p>
+                        <button class="login-btn google">
+                            <i class="fab fa-google"></i> Login with Google
+                        </button>
+                        <button class="login-btn facebook">
+                            <i class="fab fa-facebook-f"></i> Login with Facebook
+                        </button>
+                        <button class="login-btn phone">
+                            <i class="fas fa-phone"></i> Login with Phone
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Home/Dashboard -->
+            <div class="section" id="homeSection">
+                <h2 class="section-title">Dashboard</h2>
+                <p>Welcome to Mitra Copilot. Select a feature from the bottom navigation.</p>
+            </div>
+
+            <!-- Copilot Chat -->
+            <div class="section" id="copilotSection">
+                <h2 class="section-title">Copilot Assistant</h2>
+                <div class="chat-container">
+                    <div class="prompt-suggestions">
+                        <div class="prompt-suggestion">How to create QRIS merchant</div>
+                        <div class="prompt-suggestion">Register Shopee seller account</div>
+                        <div class="prompt-suggestion">Create Instagram business account</div>
+                        <div class="prompt-suggestion">Business proposal template</div>
+                    </div>
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message ai">
+                            Hello! I'm your Mitra Copilot assistant. How can I help your UMKM today?
+                            <br><br>
+                            Try asking:
+                            <br>
+                            • "How to create QRIS for my business?"
+                            <br>
+                            • "Steps to register on Shopee"
+                        </div>
+                    </div>
+                    <div class="chat-input-container">
+                        <input type="text" class="chat-input" id="chatInput" placeholder="Ask me anything...">
+                        <button class="send-btn" id="sendBtn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Market Analysis -->
+            <div class="section" id="marketSection">
+                <h2 class="section-title">Market Analysis</h2>
+                <div class="chart-container">
+                    <canvas id="economicChart"></canvas>
+                </div>
+                
+                <h3 style="margin-bottom: 15px;">Market Segmentation (Food Industry)</h3>
+                <div class="segmentation-tabs">
+                    <div class="segmentation-tab active" data-tab="demografi">Demografi</div>
+                    <div class="segmentation-tab" data-tab="sosiografi">Sosiografi</div>
+                    <div class="segmentation-tab" data-tab="ekonomi">Ekonomi</div>
+                    <div class="segmentation-tab" data-tab="psikografi">Psikografi</div>
+                </div>
+                
+                <div class="segmentation-content">
+                    <table class="segmentation-table" id="demografiTable">
+                        <thead>
+                            <tr>
+                                <th>Segment</th>
+                                <th>Population</th>
+                                <th>Potential</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Age 18-25</td>
+                                <td>32%</td>
+                                <td>High</td>
+                            </tr>
+                            <tr>
+                                <td>Age 26-40</td>
+                                <td>45%</td>
+                                <td>Very High</td>
+                            </tr>
+                            <tr>
+                                <td>Age 41-60</td>
+                                <td>20%</td>
+                                <td>Medium</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <table class="segmentation-table" id="sosiografiTable" style="display: none;">
+                        <!-- Sosiografi data would go here -->
+                    </table>
+                </div>
+            </div>
+
+            <!-- Content Design -->
+            <div class="section" id="designSection">
+                <h2 class="section-title">Content Design</h2>
+                <div class="design-tool">
+                    <div class="design-sidebar">
+                        <h3>Templates</h3>
+                        <div class="template-thumbnail" data-template="feed">
+                            <img src="" alt="Feed Template" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <div class="template-thumbnail" data-template="story">
+                            <img src="" alt="Story Template" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <div class="template-thumbnail" data-template="reels">
+                            <img src="" alt="Reels Template" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                    </div>
+                    <div class="design-canvas">
+                        <div class="canvas-container" id="canvas">
+                            <!-- Canvas content will be generated here -->
+                        </div>
+                        <div class="export-options">
+                            <button class="export-btn" data-format="jpg">JPG</button>
+                            <button class="export-btn" data-format="png">PNG</button>
+                            <button class="export-btn" data-format="pdf">PDF</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- News -->
+            <div class="section" id="newsSection">
+                <h2 class="section-title">Business News</h2>
+                <div class="news-grid">
+                    <div class="news-card">
+                        <img src="https://via.placeholder.com/300x150" alt="News" class="news-image">
+                        <div class="news-content">
+                            <div class="news-source">CNBC</div>
+                            <h3 class="news-title">Economic Growth Reaches 5.2% in Q2 2023</h3>
+                            <div class="news-date">2 hours ago</div>
+                        </div>
+                    </div>
+                    <div class="news-card">
+                        <img src="https://via.placeholder.com/300x150" alt="News" class="news-image">
+                        <div class="news-content">
+                            <div class="news-source">Kompas</div>
+                            <h3 class="news-title">New Regulation for UMKM Digital Taxation</h3>
+                            <div class="news-date">5 hours ago</div>
+                        </div>
+                    </div>
+                    <div class="news-card">
+                        <img src="https://via.placeholder.com/300x150" alt="News" class="news-image">
+                        <div class="news-content">
+                            <div class="news-source">McKinsey</div>
+                            <h3 class="news-title">Global Trends in E-Commerce for 2023</h3>
+                            <div class="news-date">1 day ago</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings -->
+            <div class="section" id="settingsSection">
+                <h2 class="section-title">Settings</h2>
+                <div class="settings-card">
+                    <h3 class="settings-title">Appearance</h3>
+                    <div class="settings-item">
+                        <span>Dark Mode</span>
+                        <label class="switch">
+                            <input type="checkbox" id="darkModeToggle" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="settings-card">
+                    <h3 class="settings-title">About</h3>
+                    <p style="margin-bottom: 15px; line-height: 1.6;">
+                        Mitra Copilot 1.0 is a conversational AI platform designed to help UMKM with digital transformation. 
+                        Our features include AI assistance, market analysis, document processing, content design, and business news.
+                    </p>
+                    <div class="settings-item">
+                        <span>Version</span>
+                        <span>1.0.0</span>
+                    </div>
+                    <div class="settings-item">
+                        <span>Developer</span>
+                        <span>Mitra Copilot Team</span>
+                    </div>
+                </div>
+                
+                <div class="version-info">
+                    © 2023 Mitra Copilot. All rights reserved.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="nav-bottom">
+        <a href="#" class="nav-item" data-section="homeSection">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="#" class="nav-item" data-section="copilotSection">
+            <i class="fas fa-robot"></i>
+            <span>Copilot</span>
+        </a>
+        <a href="#" class="nav-item" data-section="marketSection">
+            <i class="fas fa-chart-line"></i>
+            <span>Market</span>
+        </a>
+        <a href="#" class="nav-item" data-section="designSection">
+            <i class="fas fa-palette"></i>
+            <span>Design</span>
+        </a>
+        <a href="#" class="nav-item" data-section="newsSection">
+            <i class="fas fa-newspaper"></i>
+            <span>News</span>
+        </a>
+    </div>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const html = document.documentElement;
+        
+        function setTheme(isDark) {
+            if (isDark) {
+                html.setAttribute('data-theme', 'dark');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                html.setAttribute('data-theme', 'light');
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        }
+        
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        setTheme(savedTheme === 'dark');
+        darkModeToggle.checked = savedTheme === 'dark';
+        
+        themeToggle.addEventListener('click', () => {
+            const isDark = html.getAttribute('data-theme') === 'dark';
+            setTheme(!isDark);
+            darkModeToggle.checked = !isDark;
+        });
+        
+        darkModeToggle.addEventListener('change', (e) => {
+            setTheme(e.target.checked);
+        });
+        
+        // Navigation
+        const navItems = document.querySelectorAll('.nav-item');
+        const sections = document.querySelectorAll('.section');
+        
+        function showSection(sectionId) {
+            sections.forEach(section => {
+                section.classList.remove('active');
+                if (section.id === sectionId) {
+                    section.classList.add('active');
+                }
+            });
+            
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('data-section') === sectionId) {
+                    item.classList.add('active');
+                }
+            });
+            
+            // Hide login section when other sections are shown
+            if (sectionId !== 'loginSection') {
+                document.getElementById('loginSection').classList.remove('active');
+            }
+        }
+        
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                showSection(item.getAttribute('data-section'));
+            });
+        });
+        
+        // Login buttons
+        const loginButtons = document.querySelectorAll('.login-btn');
+        loginButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // In a real app, this would handle authentication
+                showSection('homeSection');
+            });
+        });
+        
+        // Chatbot functionality
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const chatMessages = document.getElementById('chatMessages');
+        const promptSuggestions = document.querySelectorAll('.prompt-suggestion');
+        
+        function addMessage(text, isUser) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(isUser ? 'user' : 'ai');
+            messageDiv.textContent = text;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function simulateAIResponse(userMessage) {
+            // Show typing indicator
+            const typingDiv = document.createElement('div');
+            typingDiv.classList.add('message', 'ai');
+            typingDiv.innerHTML = `
+                <span class="typing"></span>
+                <span class="typing"></span>
+                <span class="typing"></span>
+            `;
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Simulate AI thinking time
+            setTimeout(() => {
+                // Remove typing indicator
+                chatMessages.removeChild(typingDiv);
+                
+                // Generate response based on user input
+                let response = "I'm sorry, I didn't understand that. Can you rephrase?";
+                
+                if (userMessage.toLowerCase().includes('qris')) {
+                    response = `To create a QRIS merchant account:
+1. Open your bank's mobile app (e.g., BCA, Mandiri, BRI)
+2. Go to the QRIS section
+3. Select "Register as Merchant"
+4. Fill in your business details
+5. Upload required documents
+6. Wait for verification (usually 1-2 business days)
+
+Would you like more details on any of these steps?`;
+                } else if (userMessage.toLowerCase().includes('shopee')) {
+                    response = `To register as a Shopee seller:
+1. Download the Shopee Seller app
+2. Tap "Register Now"
+3. Choose individual or business account
+4. Fill in your personal/business information
+5. Upload required documents (KTP, NPWP if available)
+6. Complete the verification process
+
+After approval, you can start listing products!`;
+                } else if (userMessage.toLowerCase().includes('instagram')) {
+                    response = `To create an Instagram business account:
+1. Go to your profile in the Instagram app
+2. Tap the menu (three lines) and select "Settings"
+3. Tap "Account" then "Switch to Professional Account"
+4. Choose "Business" and select your category
+5. Connect to a Facebook Page (optional but recommended)
+6. Complete your business profile with contact info
+
+Tip: Use relevant hashtags and post consistently!`;
+                }
+                
+                addMessage(response, false);
+            }, 1500);
+        }
+        
+        sendBtn.addEventListener('click', () => {
+            const message = chatInput.value.trim();
+            if (message) {
+                addMessage(message, true);
+                chatInput.value = '';
+                simulateAIResponse(message);
+            }
+        });
+        
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendBtn.click();
+            }
+        });
+        
+        promptSuggestions.forEach(suggestion => {
+            suggestion.addEventListener('click', () => {
+                chatInput.value = suggestion.textContent;
+                chatInput.focus();
+            });
+        });
+        
+        // Market Analysis Chart
+        const economicCtx = document.getElementById('economicChart').getContext('2d');
+        const economicChart = new Chart(economicCtx, {
+            type: 'line',
+            data: {
+                labels: ['2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
+                datasets: [{
+                    label: 'Indonesia GDP Growth (%)',
+                    data: [5.01, 4.88, 5.03, 5.07, 5.17, 5.02, -2.07, 3.69, 5.31, 5.20],
+                    borderColor: '#6200ee',
+                    backgroundColor: 'rgba(98, 0, 238, 0.1)',
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false
+                    }
+                }
+            }
+        });
+        
+        // Market Segmentation Tabs
+        const segmentationTabs = document.querySelectorAll('.segmentation-tab');
+        segmentationTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                segmentationTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // In a real app, this would load different data
+                // For demo, we just toggle table visibility
+                document.getElementById('demografiTable').style.display = 'none';
+                if (tab.getAttribute('data-tab') === 'demografi') {
+                    document.getElementById('demografiTable').style.display = 'table';
+                }
+            });
+        });
+        
+        // Content Design Tool
+        const templateThumbnails = document.querySelectorAll('.template-thumbnail');
+        templateThumbnails.forEach(thumbnail => {
+            thumbnail.addEventListener('click', () => {
+                // In a real app, this would load the selected template
+                const canvas = document.getElementById('canvas');
+                const template = thumbnail.getAttribute('data-template');
+                
+                // Clear canvas
+                canvas.innerHTML = '';
+                
+                // Add sample content based on template
+                if (template === 'feed') {
+                    canvas.innerHTML = `
+                        <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #6200ee, #3700b3); 
+                            display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; padding: 20px;">
+                            <h2 style="font-size: 24px; margin-bottom: 10px;">Your Business Name</h2>
+                            <p style="text-align: center;">Promo special hari ini!</p>
+                            <div style="margin-top: 20px; font-weight: bold; font-size: 18px;">DISKON 50%</div>
+                        </div>
+                    `;
+                } else if (template === 'story') {
+                    canvas.innerHTML = `
+                        <div style="width: 100%; height: 100%; background: linear-gradient(45deg, #ff0080, #7928ca); 
+                            display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; padding: 20px;">
+                            <h2 style="font-size: 32px; margin-bottom: 20px;">SWIPE UP</h2>
+                            <p style="text-align: center; font-size: 18px;">Untuk info produk terbaru</p>
+                        </div>
+                    `;
+                } else if (template === 'reels') {
+                    canvas.style.backgroundColor = '#000';
+                    canvas.innerHTML = `
+                        <div style="width: 100%; height: 100%; position: relative;">
+                            <div style="position: absolute; bottom: 20px; left: 20px; color: white;">
+                                <h2 style="font-size: 24px;">Produk Terbaru</h2>
+                                <p>Tersedia sekarang!</p>
+                            </div>
+                            <div style="position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.5); 
+                                color: white; padding: 5px 10px; border-radius: 5px;">
+                                @yourbusiness
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        });
+        
+        // Export buttons
+        const exportButtons = document.querySelectorAll('.export-btn');
+        exportButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const format = button.getAttribute('data-format');
+                alert(`Exporting as ${format.toUpperCase()} file...`);
+                // In a real app, this would generate the file
+            });
+        });
+    </script>
+</body>
+</html>
